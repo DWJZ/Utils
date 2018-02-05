@@ -129,3 +129,31 @@ export function request({
 			}
 		});
 }
+
+/**
+ * 添加或删除数组中的子元素
+ * @param  {String || Number} item      [数组元素]
+ * @param  {Array} array [数组]
+ * @return {Array}           [数组]
+ */
+export function togglerItemInArray(item, array) {
+	let index = array.indexOf(item)
+	if (index == -1) {
+		array.push(item)
+	} else {
+		array.splice(index, 1)
+	}
+}
+
+/**
+ * 深拷贝
+ * @param  {Object} obj [被拷贝对象]
+ * @return {Object}     [拷贝对象]
+ */
+export function jsonDeepCopy(obj) {
+	let newObj = {}
+	for (let key in obj) {
+		newObj[key] = obj[key]
+	}
+	return newObj
+}
