@@ -157,3 +157,21 @@ export function jsonDeepCopy(obj) {
 	}
 	return newObj
 }
+
+/**
+ * 复制文字到剪切板
+ * @param  {[String]} text [待复制的文字]
+ * @return  no return
+ */
+export function copyToClipboard(text) {
+  let spanEle = document.createElement('span')
+
+  var clipboard = new Clipboard(spanEle, {
+    text: () => text
+  });//实例化
+
+  spanEle.click()
+
+	spanEle = null
+
+}
