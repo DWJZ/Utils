@@ -1,16 +1,20 @@
 /**
  * 当前页面下载文件
- * @param  {String} url [下载地址 get格式] 
- * @return {none}     
+ * @param  {String} url [下载地址 get格式]
+ * @return {none}
  */
 export function downloadFile(url) {
-	let iframe = document.createElement('iframe')
-	iframe.style.display = 'none'
-	iframe.src = url
-	iframe.onload = function() {
-		document.body.removeChild(iframe)
-	}
-	document.body.appendChild(iframe)
+		let iframe = document.createElement('iframe')
+		iframe.style.display = 'none'
+		iframe.src = url
+		iframe.onload = function () {
+				document
+						.body
+						.removeChild(iframe)
+		}
+		document
+				.body
+				.appendChild(iframe)
 }
 
 /**
@@ -20,27 +24,29 @@ export function downloadFile(url) {
  * @return {[String]}      [转换后数据]
  */
 export function dateFormat(date, fmt = 'YYYY-MM-DD hh:mm:ss') {
-	date = new Date(date)
-	let options = {
-		"M+": date.getMonth() + 1 + '', //月份 
-		"D+": date.getDate() + '', //日 
-		"h+": date.getHours() + '', //小时 
-		"m+": date.getMinutes() + '', //分 
-		"s+": date.getSeconds() + '', //秒 
-		"q+": Math.floor((date.getMonth() + 3) / 3) + '', //季度 
-		"S": date.getMilliseconds() + '' //毫秒 
-	};
-	// 判断年
-	if (/(Y+)/.test(fmt)) {
-		fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
-	}
-
-	for (let key in options) {
-		if (new RegExp(`(${key})`).test(fmt)) {
-			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (options[key]) : ((`00${options[key]}`).substr(options[key].length)));
+		date = new Date(date)
+		let options = {
+				"M+": date.getMonth() + 1 + '', //月份
+				"D+": date.getDate() + '', //日
+				"h+": date.getHours() + '', //小时
+				"m+": date.getMinutes() + '', //分
+				"s+": date.getSeconds() + '', //秒
+				"q+": Math.floor((date.getMonth() + 3) / 3) + '', //季度
+				"S": date.getMilliseconds() + '' //毫秒
+		};
+		// 判断年
+		if (/(Y+)/.test(fmt)) {
+				fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
 		}
-	}
-	return fmt;
+
+		for (let key in options) {
+				if (new RegExp(`(${key})`).test(fmt)) {
+						fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1)
+								? (options[key])
+								: ((`00${options[key]}`).substr(options[key].length)));
+				}
+		}
+		return fmt;
 }
 
 /**
@@ -52,81 +58,68 @@ export function dateFormat(date, fmt = 'YYYY-MM-DD hh:mm:ss') {
  * @param  {Function} cb           [回调函数]
  */
 export function request({
-	url = '',
-	data = {},
-	successText,
-	failedText,
-	headers = {},
-	formData
+		url = '',
+		data = {},
+		successText,
+		failedText,
+		headers = {},
+		formData
 } = {}, cb) {
 
-	let _this = this
-	axios
-		.post(baseUrl + url, formData ? formData : qs.stringify(data), headers)
-		.then(response => {
-			// 失败处理
-			if (response.data.code === 1) {
-				this.$message({
-					message: response.data.msg || failedText,
-					type: 'warning'
-				})
-			} else {
-				// 成功处理
-				if (successText) {
-					this.$message({
-						message: response.data.msg || successText,
-						type: 'success'
-					})
-				}
-				cb(response.data)
-			}
-		})
-		.catch(e => {
-			// 错误处理
-			if (!(e.response)) {
-				console.error(e)
-				this.$message({
-					message: e,
-					type: 'error'
-				})
-			} else if (e.response.status == 401) {
-				// 登录过时后台返回 status 401, 此时返回登录页面
-				function unauthorizedConfirm() {
-					sessionStorage.setItem("userInfo", null)
-					_this.$alert('登录失效，请重新登录！', '提示', {
-						confirmButtonText: '确定',
-						callback: action => {
-							_this.$router.push('/login')
+		let _this = this
+		axios.post(baseUrl + url, formData
+				? formData
+				: qs.stringify(data), headers).then(response => {
+				// 失败处理
+				if (response.data.code === 1) {
+						this.$message({
+								message: response.data.msg || failedText,
+								type: 'warning'
+						})
+				} else {
+						// 成功处理
+						if (successText) {
+								this.$message({
+										message: response.data.msg || successText,
+										type: 'success'
+								})
 						}
-					});
+						cb(response.data)
 				}
+		}).catch(e => {
+				// 错误处理
+				if (!(e.response)) {
+						console.error(e)
+						this.$message({message: e, type: 'error'})
+				} else if (e.response.status == 401) {
+						// 登录过时后台返回 status 401, 此时返回登录页面
+						function unauthorizedConfirm() {
+								sessionStorage.setItem("userInfo", null)
+								_this.$alert('登录失效，请重新登录！', '提示', {
+										confirmButtonText: '确定',
+										callback: action => {
+												_this
+														.$router
+														.push('/login')
+										}
+								});
+						}
 
-				if (unauthorizedList.length < 1) {
-					unauthorizedList.push(unauthorizedConfirm)
-					setTimeout(() => {
-						unauthorizedList[0]()
-						unauthorizedList = []
-					}, 1000)
+						if (unauthorizedList.length < 1) {
+								unauthorizedList.push(unauthorizedConfirm)
+								setTimeout(() => {
+										unauthorizedList[0]()
+										unauthorizedList = []
+								}, 1000)
+						}
+
+						// this.$confirm('登录失效，请重新登录！', '提示', {   confirmButtonText: '确定',
+						// showCancelButton: false,   type: 'warning' }).then(() => {
+						// this.$router.push('/login') }).catch(() => {   this.$router.push('/login')
+						// }); this.$router.push('/login')
+				} else {
+						this.$message({message: '网络异常', type: 'error'})
 				}
-
-
-
-				// this.$confirm('登录失效，请重新登录！', '提示', {
-				//   confirmButtonText: '确定',
-				//   showCancelButton: false,
-				//   type: 'warning'
-				// }).then(() => {
-				//   this.$router.push('/login')
-				// }).catch(() => {
-				//   this.$router.push('/login')
-				// });
-				// this.$router.push('/login')
-			} else {
-				this.$message({
-					message: '网络异常',
-					type: 'error'
-				})
-			}
 		});
 }
 
@@ -137,25 +130,35 @@ export function request({
  * @return {Array}           [数组]
  */
 export function togglerItemInArray(item, array) {
-	let index = array.indexOf(item)
-	if (index == -1) {
-		array.push(item)
-	} else {
-		array.splice(index, 1)
-	}
+		let index = array.indexOf(item)
+		if (index == -1) {
+				array.push(item)
+		} else {
+				array.splice(index, 1)
+		}
 }
 
 /**
  * 深拷贝
- * @param  {Object} obj [被拷贝对象]
- * @return {Object}     [拷贝对象]
+ * @param  {Object || Array} obj [被拷贝对象]
+ * @return {Object || Array}     [拷贝对象]
  */
-export function jsonDeepCopy(obj) {
-	let newObj = {}
-	for (let key in obj) {
-		newObj[key] = obj[key]
-	}
-	return newObj
+export function deepClone(obj) {
+		let newobj;
+		if (obj) {
+				newobj = obj.constructor === Array
+						? []
+						: {};
+				for (let key in obj) {
+						newobj[key] = typeof obj[key] === 'object'
+								? deepClone(obj[key])
+								: obj[key];
+				}
+				return newobj;
+		} else {
+				return obj
+		}
+
 }
 
 /**
@@ -164,14 +167,46 @@ export function jsonDeepCopy(obj) {
  * @return  no return
  */
 export function copyToClipboard(text) {
-  let spanEle = document.createElement('span')
+		let spanEle = document.createElement('span')
 
-  var clipboard = new Clipboard(spanEle, {
-    text: () => text
-  });//实例化
+		var clipboard = new Clipboard(spanEle, {
+				text: () => text
+		}); //实例化
 
-  spanEle.click()
+		spanEle.click()
 
-	spanEle = null
+		spanEle = null
+}
 
+/**
+ *
+ * @param {Array} array
+ * @param {*} item
+ */
+function toggleArrayItem(array, item, itemKey) {
+		if (array instanceof Array) {
+				if (itemKey) {
+						let itemExist = false
+						array.forEach((arrayItem, index) => {
+								if (arrayItem[itemKey] === item[itemKey]) {
+										array.splice(index, 1)
+										itemExist = true
+								}
+						})
+
+						if (!itemExist) {
+								array.push(item)
+						}
+
+				} else {
+						let index = array.indexOf(item)
+						if (index !== -1) {
+								array.splice(index, 1)
+						} else {
+								array.push(item)
+						}
+				}
+		} else {
+				console.error(array, 'is not array')
+		}
 }
